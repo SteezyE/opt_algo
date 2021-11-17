@@ -4,7 +4,7 @@ from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 import sys
 
-sys.path.append("../../..")
+sys.path.append("../")
 
 from optimization_algorithms.interface.nlp_solver import NLPSolver
 from optimization_algorithms.interface.mathematical_program import MathematicalProgram

@@ -1,7 +1,7 @@
 import numpy as np
 import unittest
 import sys
-sys.path.append("../../..")
+sys.path.append("../")
 
 
 

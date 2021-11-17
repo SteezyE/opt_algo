@@ -1,7 +1,7 @@
 import numpy as np
 import unittest
 import sys
-sys.path.append("../../..")
+sys.path.append("../")
 
 from optimization_algorithms.utils.finite_diff import *
 from optimization_algorithms.interface.nlp_solver import  NLPSolver
