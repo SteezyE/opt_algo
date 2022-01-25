@@ -72,26 +72,27 @@ class LQR(MathematicalProgram):
 
         f = 0.0 
         for k in range(1,self.K+1):
-            f = f + x[(2*k-2)*self.N:(2*k-1)*self.N].T @ self.R @ x[(2*k-2)*self.N:(2*k-1)*self.N]
-            f = f + x[(2*k-1)*self.N:(2*k)*self.N].T @ self.Q @ x[(2*k-1)*self.N:(2*k)*self.N]
+            f = f + 0.5 * x[(2*k-2)*self.N:(2*k-1)*self.N].T @ self.R @ x[(2*k-2)*self.N:(2*k-1)*self.N]
+            f = f + 0.5 * x[(2*k-1)*self.N:(2*k)*self.N].T @ self.Q @ x[(2*k-1)*self.N:(2*k)*self.N]
         c1 = x[self.N:2*self.N] - self.B @ x[0:self.N]
         ck = np.zeros((self.K-1,self.N))
         for k in range(1,self.K):
             ck[k-1] = x[(2*k+1)*self.N:(2*k+2)*self.N]
             ck[k-1] = ck[k-1] - self.A @ x[(2*k-1)*self.N:(2*k)*self.N]
-            ck[k-1] = ck[k-1] - self.B @ x[(2*k-1)*self.N:(2*k)*self.N]
+            ck[k-1] = ck[k-1] - self.B @ x[(2*k)*self.N:(2*k+1)*self.N]
         cK = x[(2*self.K-1)*self.N:(2*self.K)*self.N] - self.Y
         y = np.concatenate((np.array([f]),c1,ck.flatten(),cK))
         ff = np.zeros(self.getDimension())
         for k in range(1,self.K+1):
-            ff[(2*k-2)*self.N:(2*k-1)*self.N] = 2.0 * self.R @ x[(2*k-2)*self.N:(2*k-1)*self.N]
-            ff[(2*k-1)*self.N:(2*k)*self.N] = 2.0 * self.Q @ x[(2*k-1)*self.N:(2*k)*self.N]
+            ff[(2*k-2)*self.N:(2*k-1)*self.N] = self.R @ x[(2*k-2)*self.N:(2*k-1)*self.N]
+            ff[(2*k-1)*self.N:(2*k)*self.N] = self.Q @ x[(2*k-1)*self.N:(2*k)*self.N]
         cc1 = np.zeros((self.N,self.getDimension()))
         cc1[0:self.N,0:self.N] = -1.0 * self.B
         cc1[0:self.N,self.N:2*self.N] = np.eye(self.N) 
         cck = np.zeros((~-self.K * self.N, self.getDimension()))
         for k in range(1,self.K):
-            cck[(k-1)*self.N:(k)*self.N,(2*k-1)*self.N:(2*k)*self.N] = -(self.A + self.B)
+            cck[(k-1)*self.N:(k)*self.N,(2*k-1)*self.N:(2*k)*self.N] = -self.A
+            cck[(k-1)*self.N:(k)*self.N,(2*k)*self.N:(2*k+1)*self.N] = -self.B
             cck[(k-1)*self.N:(k)*self.N,(2*k+1)*self.N:(2*k+2)*self.N] = np.eye(self.N) 
         ccK = np.zeros((self.N, self.getDimension()))
         ccK[0:self.N,(2*self.K-1)*self.N:(2*self.K)*self.N] = np.eye(self.N)
@@ -107,8 +108,8 @@ class LQR(MathematicalProgram):
         # Dimensionality? (2 * self.N * self.K) * (2 * self.N * self.K)
         fff = np.zeros((self.getDimension(),self.getDimension()))
         for k in range(1,self.K+1):
-            fff[(2*k-2)*self.N:(2*k-1)*self.N,(2*k-2)*self.N:(2*k-1)*self.N] = 2.0 * self.R
-            fff[(2*k-1)*self.N:(2*k)*self.N,(2*k-1)*self.N:(2*k)*self.N] = 2.0 * self.Q
+            fff[(2*k-2)*self.N:(2*k-1)*self.N,(2*k-2)*self.N:(2*k-1)*self.N] = self.R
+            fff[(2*k-1)*self.N:(2*k)*self.N,(2*k-1)*self.N:(2*k)*self.N] = self.Q
         return fff 
 
     def getDimension(self):
